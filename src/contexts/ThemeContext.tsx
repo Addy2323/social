@@ -83,14 +83,12 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   // Format price based on selected currency
   const formatPrice = (price: number): string => {
-    const convertedPrice = currency === 'TZS' ? price * USD_TO_TZS_RATE : price;
-    
     return new Intl.NumberFormat(currency === 'TZS' ? 'sw-TZ' : 'en-US', {
       style: 'currency',
       currency: currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: currency === 'TZS' ? 0 : 2,
-    }).format(convertedPrice);
+    }).format(price);
   };
 
   // Get currency symbol
