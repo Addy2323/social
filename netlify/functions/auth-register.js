@@ -1,106 +1,87 @@
-const { connectToDatabase } = require('./utils/database');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+import { connectToDatabase } from './utils/database.js';
 
-exports.handler = async (event, context) => {
-  // Enable CORS
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
+// Simple password hashing function
+const hashPassword = (password) => {
+  return crypto.createHash('sha256').update(password + 'addonet_salt').digest('hex');
+};
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
-
+export const handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' }),
+      body: JSON.stringify({ error: 'Method Not Allowed' }),
     };
   }
 
   try {
-    const { name, email, phone, password } = JSON.parse(event.body);
+    const { email, password, username } = JSON.parse(event.body);
 
-    if (!name || !email || !phone || !password) {
+    if (!email || !password || !username) {
       return {
         statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'All fields are required' }),
+        body: JSON.stringify({ error: 'Email, password, and username are required' }),
       };
     }
 
     const { db } = await connectToDatabase();
     const users = db.collection('users');
 
-    // Check if user already exists
     const existingUser = await users.findOne({ email });
     if (existingUser) {
       return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Email already registered' }),
+        statusCode: 409,
+        body: JSON.stringify({ error: 'User already exists' }),
       };
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = hashPassword(password);
 
-    // Create new user
     const newUser = {
-      name,
       email,
-      phone,
       password: hashedPassword,
+      username,
       balance: 0,
       orders: 0,
       active: 0,
       joinDate: new Date().toISOString(),
       role: 'user',
-      status: 'active'
+      createdAt: new Date(),
     };
 
     const result = await users.insertOne(newUser);
-    
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: result.insertedId, email, role: 'user' },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+
+    const token = jwt.sign({ userId: result.insertedId, role: 'user' }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    });
 
     // Return user data without password
     const userResponse = {
       id: result.insertedId,
-      name,
+      name: username,
       email,
-      phone,
+      phone: '',
       balance: 0,
       orders: 0,
       active: 0,
-      joinDate: newUser.joinDate,
+      joinDate: new Date().toISOString(),
       role: 'user'
     };
 
     return {
       statusCode: 201,
-      headers,
-      body: JSON.stringify({
+      body: JSON.stringify({ 
         success: true,
-        message: 'Registration successful',
+        message: 'User registered successfully', 
         user: userResponse,
-        token
+        token 
       }),
     };
   } catch (error) {
-    console.error('Registration error:', error);
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Internal server error' }),
+      body: JSON.stringify({ error: 'Internal Server Error', details: error.message }),
     };
   }
 };

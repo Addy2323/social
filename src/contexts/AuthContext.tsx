@@ -21,7 +21,7 @@ interface FlashMessage {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, phone: string, password: string) => Promise<boolean>;
+  register: (username: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   updateBalance: (amount: number) => void;
   updateUserStats: (orders?: number, active?: number) => void;
@@ -110,9 +110,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const register = async (name: string, email: string, phone: string, password: string): Promise<boolean> => {
+  const register = async (username: string, email: string, password: string): Promise<boolean> => {
     try {
-      const response = await authAPI.register({ name, email, phone, password });
+      const response = await authAPI.register({ username, email, password });
       
       if (response.success) {
         setUser(response.user);

@@ -37,7 +37,7 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
 
 // Auth API calls
 export const authAPI = {
-  register: async (userData: { name: string; email: string; phone: string; password: string }) => {
+  register: async (userData: { username: string; email: string; password: string }) => {
     return apiRequest('/auth-register', {
       method: 'POST',
       body: JSON.stringify(userData),

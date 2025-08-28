@@ -1,9 +1,14 @@
-const { connectToDatabase } = require('./utils/database');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { ObjectId } = require('mongodb');
+import { connectToDatabase } from './utils/database.js';
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongodb';
 
-exports.handler = async (event, context) => {
+// Simple password hashing function (must match registration)
+const hashPassword = (password) => {
+  return crypto.createHash('sha256').update(password + 'addonet_salt').digest('hex');
+};
+
+export const handler = async (event, context) => {
   // Enable CORS
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -72,6 +77,7 @@ exports.handler = async (event, context) => {
     // Find user by email
     const user = await users.findOne({ email });
     if (!user) {
+      console.log('User not found for email:', email);
       return {
         statusCode: 400,
         headers,
@@ -79,9 +85,16 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    console.log('User found:', { email: user.email, username: user.username, hasPassword: !!user.password });
+
+    // Hash the input password and compare with stored hash
+    const inputPasswordHash = hashPassword(password);
+    const isValidPassword = inputPasswordHash === user.password;
+    
+    console.log('Password comparison result:', isValidPassword);
+    
     if (!isValidPassword) {
+      console.log('Password verification failed for user:', email);
       return {
         statusCode: 400,
         headers,
@@ -91,7 +104,7 @@ exports.handler = async (event, context) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, email: user.email, role: user.role },
+      { userId: user._id, email: user.email, role: user.role || 'user' },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -99,14 +112,14 @@ exports.handler = async (event, context) => {
     // Return user data without password
     const userResponse = {
       id: user._id,
-      name: user.name,
+      name: user.username,
       email: user.email,
-      phone: user.phone,
-      balance: user.balance,
-      orders: user.orders,
-      active: user.active,
-      joinDate: user.joinDate,
-      role: user.role
+      phone: user.phone || '',
+      balance: user.balance || 0,
+      orders: user.orders || 0,
+      active: user.active || 0,
+      joinDate: user.joinDate || new Date().toISOString(),
+      role: user.role || 'user'
     };
 
     return {
