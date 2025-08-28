@@ -24,7 +24,7 @@ const services: Service[] = [
     name: 'Instagram Followers',
     platform: 'Instagram',
     description: 'High-quality followers from real accounts',
-    price: 0.0080, // 20000 TZS per 1k = 20 TZS per follower
+    price: 20, // 20000 TZS per 1k = 20 TZS per follower
     minOrder: 100,
     maxOrder: 10000,
     icon: Instagram,
@@ -35,7 +35,7 @@ const services: Service[] = [
     name: 'Instagram Likes',
     platform: 'Instagram',
     description: 'Instant likes on your posts',
-    price: 0.002, // 5, // 5000 TZS per 1k = 5 TZS per like
+    price: 10, // 5, // 5000 TZS per 1k = 5 TZS per like
     minOrder: 50,
     maxOrder: 5000,
     icon: Instagram,
@@ -46,7 +46,7 @@ const services: Service[] = [
     name: 'YouTube Views',
     platform: 'YouTube',
     description: 'Real views from active users',
-    price: 0.008, // 2000 TZS per 1k views
+    price: 15, // 2000 TZS per 1k views
     minOrder: 1000,
     maxOrder: 100000,
     icon: Youtube,
@@ -57,7 +57,7 @@ const services: Service[] = [
     name: 'TikTok Likes',
     platform: 'TikTok',
     description: 'Boost your TikTok engagement',
-    price: 0.004, // 6000 TZS per 1k = 6 TZS per like
+    price: 10, // 6000 TZS per 1k = 6 TZS per like
     minOrder: 100,
     maxOrder: 10000,
     icon: Hash,
@@ -68,7 +68,7 @@ const services: Service[] = [
     name: 'TikTok Followers',
     platform: 'TikTok',
     description: 'Grow your TikTok audience',
-    price: 0.008, // 18000 TZS per 1k = 18 TZS per follower
+    price: 20, // 18000 TZS per 1k = 18 TZS per follower
     minOrder: 100,
     maxOrder: 10000,
     icon: Hash,
@@ -79,7 +79,7 @@ const services: Service[] = [
     name: 'TikTok Views',
     platform: 'TikTok',
     description: 'Increase your video visibility',
-    price: 0.0055, // 1500 TZS per 1k = 1.5 TZS per view
+    price: 15, // 1500 TZS per 1k = 1.5 TZS per view
     minOrder: 1000,
     maxOrder: 100000,
     icon: Hash,
@@ -90,7 +90,7 @@ const services: Service[] = [
     name: 'Facebook Page Likes',
     platform: 'Facebook',
     description: 'Grow your Facebook page audience',
-    price: 15, // 15000 TZS per 1k = 15 TZS per like
+    price: 10, // 15000 TZS per 1k = 15 TZS per like
     minOrder: 50,
     maxOrder: 5000,
     icon: Facebook,
